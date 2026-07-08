@@ -3,6 +3,14 @@
     margin: 0;
 }
 
+:root {
+    --dialog-para: 1.75rem;
+    --dialog-btn: 1.25rem;
+}
+
+button:disabled{
+    cursor: not-allowed;
+}
 body {
     display: grid;
     grid-template-rows: 2fr 8fr;
@@ -24,19 +32,47 @@ body {
 }
 
 dialog {
-    display: flex;
-    align-items: center;
-    padding: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    border: none;
-    border-radius: 20px;
-    btns{
+    &:open{
+        display: flex;
+        font-size: var(--dialog-para);
+
+        flex-direction: column;
+        justify-content: space-evenly;
+        gap: 30px;
+
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        border: none;
+        border-radius: 20px;
+
+        width: 35vw;
+        height: 35vh;
+    }
+
+    &:modal {
+        inset: 0px; 
+        margin: auto;
+    }
+    .para{
+        text-align: center;
+    }
+
+    .btns{
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: space-around;
         button {
+            width: 30%;
+            &:nth-child(1){
+                border-radius: 30px;
+                background: linear-gradient(to right, #64965e33, #81ff8a33);
+            }
+            &:last-child{
+                border-radius: 30px;
+                background: linear-gradient(to right, #49324033, #ff009933);;
+            }
             text-align: center;
-            padding: 6px;
+            padding: 12px;
+            font-size: var(--dialog-btn);
         }
     }
 }

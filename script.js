@@ -111,17 +111,18 @@ const domHandler = (() => {
 
         // btn2 
         // redirects to yt tutorial
-        btn2.textContent("No!");
+        btn2.textContent = "No!";
         const link2YT = document.createElement("a");
 
         link2YT.setAttribute("href", "https://youtu.be/3qzcAMShotQ?si=c4J5aVYoWZtCH1mq");
         link2YT.setAttribute("target", "_blank");
         link2YT.setAttribute("rel", "noopener");
 
-        link2YT.addEventListener("click", ()=>{
+        btn2.addEventListener("click", () => {
+            link2YT.click();
             btn2.setAttribute("title", "You watched the tutorial didn't you?");
             btn2.disabled = true;
-        })
+        });
 
         btn2.appendChild(link2YT);
 
