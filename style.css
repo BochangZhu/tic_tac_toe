@@ -8,6 +8,9 @@
     --dialog-para: 1.75rem;
     --dialog-btn: 1.25rem;
     --header-size: 64px;
+    --form-padding: 6px;
+
+    --theme-font: "Geist Pixel";
 }
 
 button:disabled{
@@ -21,7 +24,7 @@ body {
 }
 
 .gameHeader {
-    font-size: var(--header-size);
+    font-size: var(--header-size, 64px);
 }
 
 .mainPanel {
@@ -34,10 +37,11 @@ body {
 dialog {
     &:open{
         display: flex;
-        font-size: var(--dialog-para);
+        font-size: var(--dialog-para, 1.75rem);
 
         flex-direction: column;
         justify-content: space-evenly;
+        align-items: center;
         gap: 30px;
 
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
@@ -60,6 +64,7 @@ dialog {
         display: flex;
         align-items: center;
         justify-content: space-around;
+        width: 100%;
         button {
             width: 30%;
             &:nth-child(1){
@@ -72,11 +77,33 @@ dialog {
             }
             text-align: center;
             padding: 12px;
-            font-size: var(--dialog-btn);
+            font-size: var(--dialog-btn, 1.25em);
         }
     }
     form {
-        
+        &>div {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        font-size: var(--dialog-btn, 1.25rem);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+        button {
+            background: linear-gradient(to right, #64965e, #81ff8a); 
+            padding: var(--form-padding, 12px);
+            border-radius: 20px;
+        }
+        input {
+            font-weight: bold;
+            font-size: var(--dialog-btn, 1.25rem);
+            font-family: var(--theme-font, "Geist Pixel");
+            padding: var(--form-padding, 12px);
+            border: 2px solid black;
+            border-radius: 15px;
+        }
     }
 }
 

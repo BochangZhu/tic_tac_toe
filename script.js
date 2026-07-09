@@ -67,24 +67,35 @@ const gameBoard = (() => {
 
 const createPlayer = (name) => {
     let score = 0;
-    
+    let pName = name;
+
     const scoreIncrement = () => score += 1;
 
     const scoreReset = () => score = 0;
 
     const scoreRet = () => score;
 
-    return {scoreIncrement, scoreReset, scoreRet, name};
+    const changeName = (newName) => pName = newName;
+    
+    const retName = () => pName;
+
+    return {scoreIncrement, scoreReset, scoreRet, changeName, retName};
 
 };
 
 
 const domHandler = (() => {
 
+    const link2YT = document.createElement("a");
+
+    link2YT.setAttribute("href", "https://youtu.be/3qzcAMShotQ?si=c4J5aVYoWZtCH1mq");
+    link2YT.setAttribute("target", "_blank");
+    link2YT.setAttribute("rel", "noopener");
+
     // create dialog template
     const dialog = document.createElement("dialog");
 
-    const para = document.createElement("div");
+    let para = document.createElement("div");
     para.className = "para";
 
     const btns = document.createElement("div");
@@ -126,6 +137,7 @@ const domHandler = (() => {
     input1.type = "text";
     input1.id = "p1";
     input1.required = true;
+    input1.name = "p1";
     input1.setAttribute("name", "p1");
 
     const label2 = document.createElement("label");
@@ -135,6 +147,7 @@ const domHandler = (() => {
     input2.type = "text";
     input2.id = "p2";
     input2.required = true;
+    input2.name = "p2";
     input2.setAttribute("name", "p2");
 
     group1.append(label1, input1);
@@ -148,14 +161,22 @@ const domHandler = (() => {
     nameForm.style.display = "none";
 
     const startGameEvent = (event) => {
+        // gather return val from btn val
         const modeStr = dialog.returnValue;
         if (modeStr == "bot") gameManager.toggleMode();
-        domHandler.
+        const data = new FormData(nameForm);
+        gameManager.assignPlayer(1, createPlayer(data.get("p1")));
+        gameManager.assignPlayer(2, createPlayer(data.get("p2")));
+        // render board
+        domHandler.boardUpdate();
     };
 
     const btn1Event2 = () => {
+        // 
         submit.value = "friend";
-        nameForm.style.display = "default";
+        // show name entry form
+        nameForm.style.display = "";
+        // allow input 2 for p2 name
         input2.readOnly = false;
         input2.value = "";
 
@@ -164,7 +185,7 @@ const domHandler = (() => {
 
     const btn2Event2 = () => {
         submit.value = "bot";
-        nameForm.style.display = "default";
+        nameForm.style.display = "";
         input2.readOnly = true;
         input2.value = "Silly(bot)";
 
@@ -188,11 +209,6 @@ const domHandler = (() => {
         // btn2 
         // redirects to yt tutorial
         btn2.textContent = "No, show me a tutorial";
-        const link2YT = document.createElement("a");
-
-        link2YT.setAttribute("href", "https://youtu.be/3qzcAMShotQ?si=c4J5aVYoWZtCH1mq");
-        link2YT.setAttribute("target", "_blank");
-        link2YT.setAttribute("rel", "noopener");
 
         btn2.addEventListener("click", btn2Event1);
 
@@ -213,6 +229,7 @@ const domHandler = (() => {
 
     const boardUpdate = () => {
         alert("update my board based on boardMat now.");
+        
     }
 
     const modeSelectorDOM = () => {
@@ -220,7 +237,7 @@ const domHandler = (() => {
         dialog.appendChild(nameForm);
 
         // update dialog info
-        para = "Who do you wanna play with?";
+        para.textContent = "Who do you wanna play with?";
 
         // remove link
         const link = btn2.querySelector("a");
@@ -234,8 +251,10 @@ const domHandler = (() => {
         btn2.removeEventListener("click", btn2Event1);
         btn1.removeEventListener("click", btn1Event1);
 
-        // add new events
+        // restore from leftover state
+        btn2.disabled = false;
 
+        // add new events
         btn2.addEventListener("click", btn2Event2);
         btn1.addEventListener("click", btn1Event2);
 
@@ -252,6 +271,9 @@ const gameManager = (() => {
     let whosTurn = 1; // 1 -> p1; -1 -> p2
     let gameMode = 1; // 1 -> pvp; -1 -> bot mode
 
+    let player1;
+    let player2;
+
     const toggleTurn = () => whosTurn *= -1;
 
     const toggleMode = () => gameMode *= -1;
@@ -260,7 +282,15 @@ const gameManager = (() => {
 
     const getMode = () => gameMode;
 
-    return {toggleTurn, toggleMode, getTurn, getMode};
+    const assignPlayer = (which, obj) => {
+        if (which == 1) {
+            player1 = obj;
+        }
+        else player2 = obj;
+    };
+
+    const retNameLst = () => [player1.retName(), player2.retName()];
+    return {toggleTurn, toggleMode, getTurn, getMode, assignPlayer, retNameLst};
 
 })();
 
