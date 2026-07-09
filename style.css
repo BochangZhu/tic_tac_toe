@@ -1,6 +1,7 @@
 * {
     padding: 0;
     margin: 0;
+    box-sizing: border-box;
 }
 
 :root {
@@ -73,6 +74,9 @@ dialog {
             padding: 12px;
             font-size: var(--dialog-btn);
         }
+    }
+    form {
+        
     }
 }
 

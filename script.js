@@ -65,16 +65,18 @@ const gameBoard = (() => {
 })();
 
 
-const createPlayer = ((name) => {
+const createPlayer = (name) => {
     let score = 0;
     
     const scoreIncrement = () => score += 1;
 
     const scoreReset = () => score = 0;
 
-    return {scoreIncrement, scoreReset, name};
+    const scoreRet = () => score;
 
-})();
+    return {scoreIncrement, scoreReset, scoreRet, name};
+
+};
 
 
 const domHandler = (() => {
@@ -98,7 +100,7 @@ const domHandler = (() => {
     // mandatory
     dialog.addEventListener("cancel", (e)=>{
         e.preventDefault();
-    })
+    });
 
 
     const btn2Event1 = () => {
@@ -111,23 +113,63 @@ const domHandler = (() => {
         domHandler.modeSelectorDOM();
     };
 
-    const btn2Event2 = () => {
-        
-    }
 
     const nameForm = document.createElement("form");
     nameForm.setAttribute("method", "dialog");
     const group1 = document.createElement("div");
     const group2 = document.createElement("div");
-    
+
     const label1 = document.createElement("label");
+    label1.textContent = "Enter P1's Name: "
+    label1.setAttribute("for", "p1");
     const input1 = document.createElement("input");
+    input1.type = "text";
+    input1.id = "p1";
+    input1.required = true;
+    input1.setAttribute("name", "p1");
 
     const label2 = document.createElement("label");
+    label2.textContent = "Enter P2's Name: ";
+    label2.setAttribute("for", "p2");
     const input2 = document.createElement("input");
+    input2.type = "text";
+    input2.id = "p2";
+    input2.required = true;
+    input2.setAttribute("name", "p2");
+
+    group1.append(label1, input1);
+    group2.append(label2, input2);
+
+    const submit = document.createElement("button");
+    submit.textContent = "We're ready!";
+
+    nameForm.append(group1, group2, submit);
+
+    nameForm.style.display = "none";
+
+    const startGameEvent = (event) => {
+        const modeStr = dialog.returnValue;
+        if (modeStr == "bot") gameManager.toggleMode();
+        domHandler.
+    };
 
     const btn1Event2 = () => {
+        submit.value = "friend";
+        nameForm.style.display = "default";
+        input2.readOnly = false;
+        input2.value = "";
 
+        dialog.addEventListener("close", startGameEvent);
+    }
+
+    const btn2Event2 = () => {
+        submit.value = "bot";
+        nameForm.style.display = "default";
+        input2.readOnly = true;
+        input2.value = "Silly(bot)";
+
+        dialog.addEventListener("close", startGameEvent);
+        
     }
 
     
@@ -169,11 +211,14 @@ const domHandler = (() => {
 
     }
 
-    // const boardUpdate = () => {
+    const boardUpdate = () => {
+        alert("update my board based on boardMat now.");
+    }
 
-    // }
+    const modeSelectorDOM = () => {
 
-    const modeSelectorDOM= () => {
+        dialog.appendChild(nameForm);
+
         // update dialog info
         para = "Who do you wanna play with?";
 
@@ -197,14 +242,25 @@ const domHandler = (() => {
     }
 
 
-    return {domInit};
+    return {domInit, modeSelectorDOM, boardUpdate};
 
 
 })();
 
 const gameManager = (() => {
-    let whosTurn = 0;
 
+    let whosTurn = 1; // 1 -> p1; -1 -> p2
+    let gameMode = 1; // 1 -> pvp; -1 -> bot mode
+
+    const toggleTurn = () => whosTurn *= -1;
+
+    const toggleMode = () => gameMode *= -1;
+
+    const getTurn = () => whosTurn;
+
+    const getMode = () => gameMode;
+
+    return {toggleTurn, toggleMode, getTurn, getMode};
 
 })();
 
