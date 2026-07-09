@@ -95,6 +95,40 @@ const domHandler = (() => {
 
     dialog.append(para, btns);
 
+    // mandatory
+    dialog.addEventListener("cancel", (e)=>{
+        e.preventDefault();
+    })
+
+
+    const btn2Event1 = () => {
+        link2YT.click();
+        btn2.setAttribute("title", "Did you finish the tutorial?");
+        btn2.disabled = true;
+    };
+
+    const btn1Event1 = () => {
+        domHandler.modeSelectorDOM();
+    };
+
+    const btn2Event2 = () => {
+        
+    }
+
+    const nameForm = document.createElement("form");
+    nameForm.setAttribute("method", "dialog");
+    const group1 = document.createElement("div");
+    const group2 = document.createElement("div");
+    
+    const label1 = document.createElement("label");
+    const input1 = document.createElement("input");
+
+    const label2 = document.createElement("label");
+    const input2 = document.createElement("input");
+
+    const btn1Event2 = () => {
+
+    }
 
     
     const domInit = () => {
@@ -111,24 +145,22 @@ const domHandler = (() => {
 
         // btn2 
         // redirects to yt tutorial
-        btn2.textContent = "No!";
+        btn2.textContent = "No, show me a tutorial";
         const link2YT = document.createElement("a");
 
         link2YT.setAttribute("href", "https://youtu.be/3qzcAMShotQ?si=c4J5aVYoWZtCH1mq");
         link2YT.setAttribute("target", "_blank");
         link2YT.setAttribute("rel", "noopener");
 
-        btn2.addEventListener("click", () => {
-            link2YT.click();
-            btn2.setAttribute("title", "You watched the tutorial didn't you?");
-            btn2.disabled = true;
-        });
+        btn2.addEventListener("click", btn2Event1);
 
         btn2.appendChild(link2YT);
 
 
         // btn1
-        btn1.textContent = "Of Course...";
+        btn1.textContent = "Yes!";
+
+        btn1.addEventListener("click", btn1Event1)
 
 
         document.body.append(header, mainPanel, dialog);
@@ -141,6 +173,30 @@ const domHandler = (() => {
 
     // }
 
+    const modeSelectorDOM= () => {
+        // update dialog info
+        para = "Who do you wanna play with?";
+
+        // remove link
+        const link = btn2.querySelector("a");
+        link.remove();
+
+        // reset hint
+        btn1.textContent = "My friend";
+        btn2.textContent = "Silly (bot)";
+
+        // remove events
+        btn2.removeEventListener("click", btn2Event1);
+        btn1.removeEventListener("click", btn1Event1);
+
+        // add new events
+
+        btn2.addEventListener("click", btn2Event2);
+        btn1.addEventListener("click", btn1Event2);
+
+    }
+
+
     return {domInit};
 
 
@@ -151,3 +207,5 @@ const gameManager = (() => {
 
 
 })();
+
+domHandler.domInit();
