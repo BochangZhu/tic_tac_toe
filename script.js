@@ -87,10 +87,14 @@ const createPlayer = (name) => {
 
 
 const domHandler = (() => {
+    // special items
 
     const link2YT = document.createElement("a");
 
     const mainPanel = document.createElement("div");
+
+    const boardDIV = document.createElement("div");
+
 
     link2YT.setAttribute("href", "https://youtu.be/3qzcAMShotQ?si=c4J5aVYoWZtCH1mq");
     link2YT.setAttribute("target", "_blank");
@@ -233,16 +237,54 @@ const domHandler = (() => {
 
     }
 
-    const boardUpdate = () => {
+    const boardReset = () => {
         // 1st time init board
-        if (!mainPanel.querySelector('.board')) {
-            const boardDIV = document.createElement("div");
-            boardDIV.className = "board";
+        if (!mainPanel.querySelector('.boardDIV')) {
+            boardDIV.className = "boardDIV";
+
+            let index = 0;
+
+            for (const row of gameBoard.retBoard()){
+                for (const code of row){
+                    const tempCell = document.createElement("div");
+                    tempCell.id = index;
+                    tempCell.className = "cell";
+                    boardDIV.appendChild(tempCell);
+                    index += 1;
+                }
+            }
         }
 
-        // for (const row of )
-
+        // reset
+        else {
+            const boardDIV = mainPanel.querySelector(".boardDIV");
+            Array.from(boardDIV.children).forEach(cell => {
+                cell.className = "cell";
+                const cellSVG = cell.querySelector(".svg");
+                if (cellSVG) cellSVG.remove();
+            });
+        }
     }
+
+    const cellDisplayUpdate = (pos, turn) => {
+        const target = boardDIV.children[pos];
+
+        if (turn == "1"){
+            const svgO = document.createElement("img");
+            svgO.className = "svg O";
+            svgO.src = "./asset/circleIcon.svg";
+            target.appendChild(svgO);
+        }
+        else {
+            const svgX = document.createElement("img");
+            svgX.className = "svg X";
+            svgX.src = "./asset/crossIcon.svg";
+            target.appendChild(svgX);
+        }
+
+        target.classList.add("placed");
+
+    };
 
     const modeSelectorDOM = () => {
 
@@ -273,7 +315,7 @@ const domHandler = (() => {
     }
 
 
-    return {domInit, modeSelectorDOM, boardUpdate};
+    return {domInit, modeSelectorDOM, boardReset, cellDisplayUpdate};
 
 
 })();
