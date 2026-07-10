@@ -237,6 +237,14 @@ const domHandler = (() => {
 
     }
 
+    const p2Score = document.createElement("span");
+
+    const p1Score = document.createElement("span");
+
+    const p1 = document.createElement("div");
+
+    const p2 = document.createElement("div");
+
     const boardReset = () => {
         // 1st time init board
         if (!mainPanel.querySelector('.boardDIV')) {
@@ -255,7 +263,21 @@ const domHandler = (() => {
             }
             mainPanel.appendChild(boardDIV);
 
-            const scoreBoar 
+            const scoreBoard = document.createElement("div");
+            scoreBoard.className = "scoreBoard";
+
+            const names = gameManager.retNameLst();
+            p1.textContent = names[0] + "'s score: ";
+            p2.textContent = names[1] + "'s score: ";
+
+            p1Score.textContent = "0";
+            p2Score.textContent = "0";
+            p1.appendChild(p1Score);
+            p2.appendChild(p2Score);
+
+            scoreBoard.append(p1, p2);
+
+            mainPanel.appendChild(scoreBoard);
         }
 
         // reset
@@ -349,7 +371,9 @@ const gameManager = (() => {
 
     const retNameLst = () => [player1.retName(), player2.retName()];
 
-    return {toggleTurn, toggleMode, getTurn, getMode, assignPlayer, retNameLst};
+    const retScoreLst = () => [player1.scoreRet(), player2.scoreRet()];
+
+    return {toggleTurn, toggleMode, getTurn, getMode, assignPlayer, retNameLst, retScoreLst};
 
 })();
 
