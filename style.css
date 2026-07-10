@@ -14,6 +14,7 @@
 }
 
 :root {
+    --viewport-minW: 705px;
     --dialog-para: 1.75rem;
     --dialog-btn: 1.25rem;
     --header-size: 64px;
@@ -66,6 +67,7 @@ button:disabled{
 
 /* grid */
 body {
+    min-width: var(--viewport-minW, 705px);
     height: 100vh;
     display: grid;
     grid-template-rows: 2fr 8fr;
@@ -88,17 +90,28 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: var(--gap-size, 24px);
+    padding-bottom: var(--gap-size, 24px);
 
     .scoreBoard {
-        font-size: 2.75rem;
-        top: 5%;
-        left: 5%;
+        z-index: 1;
+        font-size: 2rem;
+        top: 0;
+        left: 1%;
         position: absolute;
-        padding: 12px;
+        padding: 24px;
         display: flex;
         flex-direction: column;
         justify-content: space-around;
+
+        &::before{
+            content: "";
+            border-radius: 25px;
+            position: absolute;
+            z-index: -1;
+            inset: 0;
+            background: url(./asset/scoreBoardIMG.jpg) center / cover no-repeat;
+            opacity: 0.6;
+        }
     }
     
 }
