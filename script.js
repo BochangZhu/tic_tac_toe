@@ -176,7 +176,7 @@ const domHandler = (() => {
         gameManager.assignPlayer(1, createPlayer(data.get("p1")));
         gameManager.assignPlayer(2, createPlayer(data.get("p2")));
         // render board
-        domHandler.boardUpdate();
+        domHandler.boardReset();
     };
 
     const btn1Event2 = () => {
@@ -253,6 +253,9 @@ const domHandler = (() => {
                     index += 1;
                 }
             }
+            mainPanel.appendChild(boardDIV);
+
+            const scoreBoar 
         }
 
         // reset
@@ -266,7 +269,8 @@ const domHandler = (() => {
         }
     }
 
-    const cellDisplayUpdate = (pos, turn) => {
+    const cellDisplayUpdate = (pos) => {
+        const turn = gameManager.getTurn();
         const target = boardDIV.children[pos];
 
         if (turn == "1"){
