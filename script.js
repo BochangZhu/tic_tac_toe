@@ -14,6 +14,8 @@ const gameBoard = (() => {
         }
     }
     
+    const retBoard = () => boardMatrix;
+
     // p1 => 0, p2 => 1, draw => 3, unfinished => 4
     function decideGameState(){
         // row check
@@ -60,7 +62,7 @@ const gameBoard = (() => {
         boardMatrix[row][col] = itemCode;
     }
 
-    return {resetBoard, logBoard, decideGameState, placeItem};
+    return {resetBoard, logBoard, decideGameState, placeItem, retBoard};
 
 })();
 
@@ -87,6 +89,8 @@ const createPlayer = (name) => {
 const domHandler = (() => {
 
     const link2YT = document.createElement("a");
+
+    const mainPanel = document.createElement("div");
 
     link2YT.setAttribute("href", "https://youtu.be/3qzcAMShotQ?si=c4J5aVYoWZtCH1mq");
     link2YT.setAttribute("target", "_blank");
@@ -193,14 +197,13 @@ const domHandler = (() => {
         
     }
 
-    
+
     const domInit = () => {
         // create headerText and main
         const header = document.createElement("h1");
         header.textContent = "TIC TAC TOE";
         header.className = "gameHeader";
 
-        const mainPanel = document.createElement("div");
         mainPanel.className = "mainPanel";
 
         // init the dialog
@@ -220,16 +223,25 @@ const domHandler = (() => {
 
         btn1.addEventListener("click", btn1Event1)
 
-
-        document.body.append(header, mainPanel, dialog);
+        const icon = document.createElement("img");
+        icon.src = "./asset/tic-icon.png";
+        icon.alt = "icon";
+        icon.className = "icon";
+        document.body.append(header, mainPanel, dialog, icon);
 
         dialog.showModal();
 
     }
 
     const boardUpdate = () => {
-        alert("update my board based on boardMat now.");
-        
+        // 1st time init board
+        if (!mainPanel.querySelector('.board')) {
+            const boardDIV = document.createElement("div");
+            boardDIV.className = "board";
+        }
+
+        // for (const row of )
+
     }
 
     const modeSelectorDOM = () => {
@@ -290,6 +302,7 @@ const gameManager = (() => {
     };
 
     const retNameLst = () => [player1.retName(), player2.retName()];
+
     return {toggleTurn, toggleMode, getTurn, getMode, assignPlayer, retNameLst};
 
 })();
