@@ -134,7 +134,7 @@ body {
     position: absolute;
     top: 0;
     right: 1%;
-    height: 50%;
+    min-height: 50%;
     min-width: 342px;
     padding: 32px 48px;
     row-gap: 12px;

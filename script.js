@@ -260,22 +260,38 @@ const domHandler = (() => {
                     const tempCell = document.createElement("div");
                     tempCell.id = index;
                     tempCell.className = "cell";
+
                     tempCell.addEventListener("click", (event)=>{
-                        // get coordinate of the clicked cell
+                        // "frontend" update
                         const id = event.target.id;
+                        domHandler.cellDisplayUpdate(id);
+
+                        // noti move
                         const [row, col] = [Math.floor(id / 3), id % 3];
                         const turn = gameManager.getTurn();
-                        // infer the code
+                        domHandler.notifyDecision(row, col, turn);
+
+                        // backend
                         const code = (turn == 1) ? 0 : 1;
                         gameBoard.placeItem(code, row, col);
                         const gameState = gameBoard.decideGameState();
 
+                        // switch turn
+                        gameManager.toggleTurn();
+                        // if one wins or draw, noti win -> update score -> reset board mat -> clear boardDIV display
                         if (gameState != 4) {
                             domHandler.notifyWin(gameState);
-                            return;
+                            // scoreBoard update
+                            domHandler.updateScoreDisplay();
+                            // backend reset
+                            gameBoard.resetBoard();
+                            // visual reset
+                            domHandler.boardReset();
+                            if (turn == -1) gameManager.toggleTurn();
                         }
-
+                        domHandler.notifyTurn();
                     });
+
                     boardDIV.appendChild(tempCell);
                     index += 1;
                 }
@@ -324,7 +340,7 @@ const domHandler = (() => {
         const turn = gameManager.getTurn();
         const target = boardDIV.children[pos];
 
-        if (turn == "1"){
+        if (turn){
             const svgO = document.createElement("img");
             svgO.className = "svg O";
             svgO.src = "./asset/circleIcon.svg";
@@ -411,6 +427,7 @@ const domHandler = (() => {
     };
 
     const notifyWin = (gameState) => {
+        domHandler.clearActiveHistory();
         const stateDIV = document.createElement("div");
         stateDIV.setAttribute("active","");
         stateDIV.className = "state";
