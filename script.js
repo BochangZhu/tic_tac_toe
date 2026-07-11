@@ -21,29 +21,25 @@ const gameBoard = (() => {
         // row check
         for (const row of boardMatrix){
             if (row[0] == row[1] && row[1] == row[2] && row[0] >= 0){
-                if (row[0] == 0) return 0;
-                else return 1;
+                return row[0];
             }
         }
 
         // col check
         for (let i = 0; i < 3; i++) {
             if (boardMatrix[0][i] == boardMatrix[1][i] && boardMatrix[0][i] == boardMatrix[2][i] && boardMatrix[0][i] >= 0){
-                if (boardMatrix[0][i] == 0) return 0;
-                else return 1;
+                return boardMatrix[0][i]
             }
         }
 
         // diagonal check
 
         if (boardMatrix[0][0] == boardMatrix[1][1] && boardMatrix[0][0] == boardMatrix[2][2] && boardMatrix[0][0] >= 0){
-            if (boardMatrix[0][0] == 0) return 0;
-            else return 1; 
+            return boardMatrix[0][0];
         }
 
         if (boardMatrix[0][2] == boardMatrix[1][1] && boardMatrix[0][2] == boardMatrix[2][0] && boardMatrix[0][2] >= 0){
-            if (boardMatrix[0][2] == 0) return 0;
-            else return 1; 
+            return boardMatrix[0][2];
         }
 
         // draw check
@@ -57,8 +53,7 @@ const gameBoard = (() => {
     }
 
     // put literal to arr position
-    function placeItem(itemCode, pos){
-        const [row, col] = pos;
+    function placeItem(itemCode, row, col){
         boardMatrix[row][col] = itemCode;
     }
 
@@ -265,6 +260,22 @@ const domHandler = (() => {
                     const tempCell = document.createElement("div");
                     tempCell.id = index;
                     tempCell.className = "cell";
+                    tempCell.addEventListener("click", (event)=>{
+                        // get coordinate of the clicked cell
+                        const id = event.target.id;
+                        const [row, col] = [Math.floor(id / 3), id % 3];
+                        const turn = gameManager.getTurn();
+                        // infer the code
+                        const code = (turn == 1) ? 0 : 1;
+                        gameBoard.placeItem(code, row, col);
+                        const gameState = gameBoard.decideGameState();
+
+                        if (gameState != 4) {
+                            domHandler.notifyWin(gameState);
+                            return;
+                        }
+
+                    });
                     boardDIV.appendChild(tempCell);
                     index += 1;
                 }
@@ -358,7 +369,15 @@ const domHandler = (() => {
 
     }
 
+    const clearActiveHistory = () =>{
+        const active = hisBoard.querySelector("[active]");
+        if (active){
+            active.removeAttribute("active");
+        }
+    }
+
     const notifyTurn = () => {
+        domHandler.clearActiveHistory();
         const target;
         const symbol;
 
@@ -377,7 +396,45 @@ const domHandler = (() => {
         turnDIV.textContent = "It's " + target + "'s turn, place your " + symbol + "!";
         
         hisBoard.appendChild(turnDIV);
-    }
+    };
+
+    const notifyDecision = (row, col, turn) => {
+        domHandler.clearActiveHistory();
+        const decDIV = document.createElement("div");
+        decDIV.setAttribute("active","");
+        decDIV.className = "decision";
+        let symbol;
+        if (turn == 1) symbol = "O";
+        else symbol = "X";
+        decDIV.textContent = `${symbol} is placed at row ${row+1} and column ${col+1}.`;
+        hisBoard.appendChild(decDIV);
+    };
+
+    const notifyWin = (gameState) => {
+        const stateDIV = document.createElement("div");
+        stateDIV.setAttribute("active","");
+        stateDIV.className = "state";
+        switch (gameState){
+            case 0:
+                const wording = gameManager.retNameLst[0];
+                gameManager.incrementScore(0);
+                const score = gameManager.retScoreLst[0];
+                stateDIV.textContent = `${wording} wins! Score is ${score} now!`;
+                break;
+
+            case 1:
+                const wording = gameManager.retNameLst[1];
+                gameManager.incrementScore(1);
+                const score = gameManager.retScoreLst[1];
+                stateDIV.textContent = `${wording} wins! Score is ${score} now!`;
+                break;
+
+            case 3:
+                stateDIV.textContent = `Draw!`;
+        }
+
+        hisBoard.appendChild(stateDIV);
+    };
 
     const updateScoreDisplay = () => {
         const [p1, p2] = gameManager.retScoreLst();
@@ -415,6 +472,11 @@ const gameManager = (() => {
     const retNameLst = () => [player1.retName(), player2.retName()];
 
     const retScoreLst = () => [player1.scoreRet(), player2.scoreRet()];
+
+    const incrementScore = (who) => {
+        if (who) player2.scoreIncrement();
+        else player1.scoreIncrement();
+    };
 
     return {toggleTurn, toggleMode, getTurn, getMode, assignPlayer, retNameLst, retScoreLst};
 
