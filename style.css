@@ -14,12 +14,12 @@
 }
 
 :root {
-    --viewport-minW: 705px;
+    --viewport-minW: 1135px;
     --dialog-para: 1.75rem;
     --dialog-btn: 1.25rem;
     --header-size: 64px;
     --form-padding: 6px;
-
+    --board-font-size: 2.25rem;
     --theme-font: "Geist Pixel";
 
     --icon-width: 150px;
@@ -30,15 +30,15 @@
 /* special items*/
 .icon {
     position: fixed;
-    top: 0%;
-    right: 20%;
+    top: 2%;
+    right: 35%;
     width: var(--icon-width, 100px);
     z-index: -1;
+    opacity: 0.3;
 }
 
 .boardDIV {
-    border: 8px solid;
-	border-color: #2F2D2D #434040 #4F4C4C #434040;
+    border: 8px solid black;
     border-radius: 25px;
     width: 35vmax;
     height: 35vmax;
@@ -50,7 +50,7 @@
             cursor: not-allowed;
             opacity: 0.65;
         }
-        border: 3px solid black;
+        border: 5px solid black;
         padding: 10px;
     }
 }
@@ -67,7 +67,7 @@ button:disabled{
 
 /* grid */
 body {
-    min-width: var(--viewport-minW, 705px);
+    min-width: var(--viewport-minW, 1135px);
     height: 100vh;
     display: grid;
     grid-template-rows: 2fr 8fr;
@@ -82,7 +82,7 @@ body {
     align-self: center;
 }
 
-/* container for boardDIV */
+/* helper boards */
 .mainPanel {
     width: 100%;
     position: relative;
@@ -93,16 +93,30 @@ body {
     padding-bottom: var(--gap-size, 24px);
 
     .scoreBoard {
+        height: 50%;
         z-index: 1;
-        font-size: 2rem;
+        font-size: var(--board-font-size, 2.25rem);
         top: 0;
         left: 1%;
         position: absolute;
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
+        padding: 32px 48px;
+        display: grid;
+        grid-template: 1.5fr 1fr 1fr / 2fr 1fr;
+        row-gap: var(--gap-size, 24px);
+        align-items: center;
+        justify-items: start;
 
+        .scoreTitle {
+            grid-area: 1 / 1 / 2 / 3;
+            justify-self: center;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        /* select score */
+        &>*:nth-child(2n+3){
+            font-style: italic;
+            justify-self: end;
+        }
         &::before{
             content: "";
             border-radius: 25px;
@@ -115,6 +129,44 @@ body {
     }
     
 }
+
+.hisBoard {
+    position: absolute;
+    top: 0;
+    right: 1%;
+    height: 50%;
+    min-width: 342px;
+    padding: 32px 48px;
+    row-gap: 12px;
+    align-items: center;
+    justify-items: start;
+    display: grid;
+    grid-auto-flow: row;
+    grid-auto-rows: 20%;
+    font-size: var(--board-font-size, 2.25rem);
+    overflow-y: auto;
+
+    &>*:first-child {
+        font-weight: bold;
+        justify-self: center;
+    }
+    &>*:nth-child(n+2) {
+        font-style: italic;
+    }
+
+    &::before{
+        content: "";
+        border-radius: 25px;
+        position: absolute;
+        z-index: -1;
+        inset: 0;
+        background: url(./asset/scoreBoardIMG.jpg) center / cover no-repeat;
+        opacity: 0.6;
+    }
+
+}
+
+
 
 /* dialog + inner Form*/
 dialog {

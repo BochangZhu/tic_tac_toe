@@ -146,6 +146,7 @@ const domHandler = (() => {
     input1.id = "p1";
     input1.required = true;
     input1.name = "p1";
+    input1.pattern = ".{0,10}";
     input1.setAttribute("name", "p1");
 
     const label2 = document.createElement("label");
@@ -156,6 +157,7 @@ const domHandler = (() => {
     input2.id = "p2";
     input2.required = true;
     input2.name = "p2";
+    input2.pattern = ".{0,10}";
     input2.setAttribute("name", "p2");
 
     group1.append(label1, input1);
@@ -237,17 +239,23 @@ const domHandler = (() => {
 
     }
 
+    // global node for board
     const p2Score = document.createElement("span");
 
     const p1Score = document.createElement("span");
 
-    const p1 = document.createElement("div");
+    const p2Name = document.createElement("span");
 
-    const p2 = document.createElement("div");
+    const p1Name = document.createElement("span");
+
+    const hisBoard = document.createElement("div");
+
+    const scoreBoard = document.createElement("div");
 
     const boardReset = () => {
         // 1st time init board
         if (!mainPanel.querySelector('.boardDIV')) {
+            // insert scoreBoard
             boardDIV.className = "boardDIV";
 
             let index = 0;
@@ -263,21 +271,31 @@ const domHandler = (() => {
             }
             mainPanel.appendChild(boardDIV);
 
-            const scoreBoard = document.createElement("div");
+            // insert scoreBoard
             scoreBoard.className = "scoreBoard";
 
-            const names = gameManager.retNameLst();
-            p1.textContent = names[0] + "'s score: ";
-            p2.textContent = names[1] + "'s score: ";
+            const title = document.createElement("div");
+            title.textContent = "Live Score";
+            title.className = "scoreTitle";
 
+            const names = gameManager.retNameLst();
+            p1Name.textContent = names[0];
+            p2Name.textContent = names[1];
             p1Score.textContent = "0";
             p2Score.textContent = "0";
-            p1.appendChild(p1Score);
-            p2.appendChild(p2Score);
 
-            scoreBoard.append(p1, p2);
+            scoreBoard.append(title, p1Name, p1Score, p2Name, p2Score);
 
             mainPanel.appendChild(scoreBoard);
+
+            // insert historyBoard
+
+            hisBoard.className = "hisBoard";
+            const hisTitle = document.createElement("div");
+            hisTitle.className = "hisTitle";
+            hisTitle.textContent = "History";
+            hisBoard.appendChild(hisTitle);
+            mainPanel.appendChild(hisBoard);
         }
 
         // reset
@@ -340,7 +358,32 @@ const domHandler = (() => {
 
     }
 
+    const notifyTurn = () => {
+        const target;
+        const symbol;
 
+        if (gameManager.getTurn() == 1){
+            target = gameManager.retNameLst[0];
+            symbol = "O";
+        }
+        else {
+            target = gameManager.retNameLst[1];
+            symbol = "X";
+        }
+        
+        const turnDIV = document.createElement("div");
+        turnDIV.setAttribute("active","");
+        turnDIV.className = "turn";
+        turnDIV.textContent = "It's " + target + "'s turn, place your " + symbol + "!";
+        
+        hisBoard.appendChild(turnDIV);
+    }
+
+    const updateScoreDisplay = () => {
+        const [p1, p2] = gameManager.retScoreLst();
+        p1Score.textContent = p1;
+        p2Score.textContent = p2;
+    }
     return {domInit, modeSelectorDOM, boardReset, cellDisplayUpdate};
 
 
