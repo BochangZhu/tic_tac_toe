@@ -21,7 +21,7 @@
     --form-padding: 6px;
     --board-font-size: 2.25rem;
     --theme-font: "Geist Pixel";
-    --his-font-size: 25px;
+    --his-font-size: 27.5px;
 
     --icon-width: 150px;
 
@@ -50,6 +50,7 @@
         place-content: center;
         &.placed:hover, &.placed>*:hover {
             cursor: not-allowed;
+            pointer-events: none;
         }
         border: 5px solid black;
     }
@@ -58,7 +59,11 @@
 .svg {
     width: calc(35vmax / 3 - 20px);
     height: calc(35vmax / 3 - 20px);
-    animation: fadeIn 1.5s ease-in-out forwards;
+    &.X {
+        width: calc(35vmax / 3 - 65px);
+        height: calc(35vmax / 3 - 65px);
+    }
+    animation: fadeIn 0.25s ease-in-out forwards;
 }
 
 button:disabled{
@@ -102,9 +107,12 @@ body {
         position: absolute;
         padding: 32px 48px;
         display: grid;
-        grid-template: 1.5fr 1fr 1fr / 2fr 1fr;
+        grid-template: 0.1fr 1fr 1fr / 2fr 1fr;
         align-items: center;
         justify-items: start;
+        &>*:nth-child(2n+3){
+            font-weight: bold;
+        }
         .reset {
             position: absolute;
             right: 6%;
@@ -117,8 +125,8 @@ body {
             }
         }
 
-
         .scoreTitle {
+            border-bottom: 5px solid rgb(165, 79, 42);
             grid-area: 1 / 1 / 2 / 3;
             justify-self: center;
             font-weight: bold;
@@ -153,24 +161,48 @@ body {
     align-items: start;
     justify-items: start;
     display: grid;
-    grid-auto-rows: repeat(5, 1fr);
-    font-size: var(--his-font-size, 25px);
+    grid-template-rows: repeat(5, 1fr);
+    font-size: var(--his-font-size, 27.5px);
     overflow-y: auto;
     .hisTitle {
         align-self: start;
+        font-size: var(--board-font-size, 2.25rem);
     }
     &>div.state {
-        font-weight: bold;
+        position: relative;
+        &.win::after{
+            position: absolute;
+            left: -17%;
+            content: "";
+            width: 27%;
+            height: 120%;
+            background: url(./asset/winnerIcon.svg) center / contain no-repeat;
+        }
+        &.draw::after{
+            position: absolute;
+            left: -42%;
+            content: "";
+            width: 36%;
+            height: 110%;
+            background: url(./asset/drawIcon.svg) center / contain no-repeat;
+        }
+
+        font-weight: bolder;
+    }
+    &>div.decision{
+        font-size: 22.5px;
+        font-style: italic;
+        border-bottom: 1px dashed black;
     }
     &>div[active] {
         color: green;
+        font-weight: bold;
     }
     &>*:first-child {
         font-weight: bold;
         justify-self: center;
     }
-    &>*:nth-child(n+2) {
-        font-style: italic;
+    &>*:nth-child(1) {
         border-bottom: 5px solid rgb(165, 79, 42);
     }
 

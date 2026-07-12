@@ -247,6 +247,8 @@ const domHandler = (() => {
 
     const scoreBoard = document.createElement("div");
 
+    let round = 1;
+
     const clearActiveHistory = () =>{
         const active = hisBoard.querySelector("[active]");
         if (active){
@@ -254,7 +256,7 @@ const domHandler = (() => {
         }
         const notiLst = hisBoard.children;
         if (notiLst.length == 5){
-            notiLst[0].remove();
+            notiLst[1].remove();
         }
     }
 
@@ -279,7 +281,7 @@ const domHandler = (() => {
 
                         // noti move
                         const [row, col] = [Math.floor(id / 3), id % 3];
-                        const turn = gameManager.getTurn();
+                        let turn = gameManager.getTurn();
                         domHandler.notifyDecision(row, col, turn);
 
                         // backend
@@ -291,6 +293,7 @@ const domHandler = (() => {
                         gameManager.toggleTurn();
                         // if one wins or draw, noti win -> update  score -> reset board mat -> clear boardDIV display
                         if (gameState != 4) {
+                            turn = gameManager.getTurn();
                             domHandler.notifyWin(gameState);
                             // scoreBoard update
                             domHandler.updateScoreDisplay();
@@ -298,7 +301,14 @@ const domHandler = (() => {
                             gameBoard.resetBoard();
                             // visual reset
                             domHandler.boardReset();
-                            if (turn == -1) gameManager.toggleTurn();
+                            // exchange first hand
+                            if (round % 2 == 0) {
+                                if (turn == -1) gameManager.toggleTurn();
+                            }
+                            else {
+                                if (turn == 1) gameManager.toggleTurn();
+                            }
+                            round += 1;
                         }
                         domHandler.notifyTurn();
                     });
@@ -375,7 +385,7 @@ const domHandler = (() => {
         const turn = gameManager.getTurn();
         const target = boardDIV.children[pos];
 
-        if (turn){
+        if (turn == 1){
             const svgO = document.createElement("img");
             svgO.className = "svg O";
             svgO.src = "./asset/circleIcon.svg";
@@ -426,11 +436,11 @@ const domHandler = (() => {
         let symbol;
 
         if (gameManager.getTurn() == 1){
-            target = gameManager.retNameLst[0];
+            target = gameManager.retNameLst()[0];
             symbol = "O";
         }
         else {
-            target = gameManager.retNameLst[1];
+            target = gameManager.retNameLst()[1];
             symbol = "X";
         }
         
@@ -463,24 +473,26 @@ const domHandler = (() => {
         let score;
         switch (gameState){
             case 0:
-                wording = gameManager.retNameLst[0];
+                wording = gameManager.retNameLst()[0];
                 gameManager.incrementScore(0);
-                score = gameManager.retScoreLst[0];
+                score = gameManager.retScoreLst()[0];
                 stateDIV.textContent = `${wording} wins! Score is ${score} now!`;
+                stateDIV.classList.add("win");
                 break;
 
             case 1:
-                wording = gameManager.retNameLst[1];
+                wording = gameManager.retNameLst()[1];
                 gameManager.incrementScore(1);
-                score = gameManager.retScoreLst[1];
+                score = gameManager.retScoreLst()[1];
                 stateDIV.textContent = `${wording} wins! Score is ${score} now!`;
+                stateDIV.classList.add("win");
                 break;
 
             case 3:
                 stateDIV.textContent = `Draw!`;
+                stateDIV.classList.add("draw");
                 break;
         }
-
         hisBoard.appendChild(stateDIV);
     };
 
