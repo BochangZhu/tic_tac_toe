@@ -247,6 +247,17 @@ const domHandler = (() => {
 
     const scoreBoard = document.createElement("div");
 
+    const clearActiveHistory = () =>{
+        const active = hisBoard.querySelector("[active]");
+        if (active){
+            active.removeAttribute("active");
+        }
+        const notiLst = hisBoard.children;
+        if (notiLst.length == 5){
+            notiLst[0].remove();
+        }
+    }
+
     const boardReset = () => {
         // 1st time init board
         if (!mainPanel.querySelector('.boardDIV')) {
@@ -278,7 +289,7 @@ const domHandler = (() => {
 
                         // switch turn
                         gameManager.toggleTurn();
-                        // if one wins or draw, noti win -> update score -> reset board mat -> clear boardDIV display
+                        // if one wins or draw, noti win -> update  score -> reset board mat -> clear boardDIV display
                         if (gameState != 4) {
                             domHandler.notifyWin(gameState);
                             // scoreBoard update
@@ -302,7 +313,7 @@ const domHandler = (() => {
             scoreBoard.className = "scoreBoard";
 
             const title = document.createElement("div");
-            title.textContent = "Live Score";
+            title.textContent = "Score";
             title.className = "scoreTitle";
 
             const names = gameManager.retNameLst();
@@ -322,6 +333,30 @@ const domHandler = (() => {
             hisTitle.className = "hisTitle";
             hisTitle.textContent = "History";
             hisBoard.appendChild(hisTitle);
+            const resetIcon = document.createElement("img");
+            resetIcon.className = "reset";
+            resetIcon.alt = "reset score";
+            resetIcon.src = "./asset/resetIcon.svg";
+            resetIcon.addEventListener("click", () =>{
+                dialog.removeEventListener("close", startGameEvent);
+                para.textContent = "Reset scores for both players?";
+                btn1.textContent = "Confirm";
+                btn2.textContent = "Cancel";
+                btn1.removeEventListener("click", btn1Event2);
+                btn2.removeEventListener("click", btn2Event2);
+                nameForm.remove();
+                submit.remove();
+                btn1.addEventListener("click", ()=>{
+                    dialog.close();
+                    gameManager.resetScore();
+                    domHandler.updateScoreDisplay();
+                });
+                btn2.addEventListener("click", ()=>{
+                    dialog.close();
+                })
+                dialog.showModal();
+            });
+            scoreBoard.appendChild(resetIcon);
             mainPanel.appendChild(hisBoard);
         }
 
@@ -385,17 +420,10 @@ const domHandler = (() => {
 
     }
 
-    const clearActiveHistory = () =>{
-        const active = hisBoard.querySelector("[active]");
-        if (active){
-            active.removeAttribute("active");
-        }
-    }
-
     const notifyTurn = () => {
-        domHandler.clearActiveHistory();
-        const target;
-        const symbol;
+        clearActiveHistory();
+        let target;
+        let symbol;
 
         if (gameManager.getTurn() == 1){
             target = gameManager.retNameLst[0];
@@ -415,7 +443,7 @@ const domHandler = (() => {
     };
 
     const notifyDecision = (row, col, turn) => {
-        domHandler.clearActiveHistory();
+        clearActiveHistory();
         const decDIV = document.createElement("div");
         decDIV.setAttribute("active","");
         decDIV.className = "decision";
@@ -427,27 +455,30 @@ const domHandler = (() => {
     };
 
     const notifyWin = (gameState) => {
-        domHandler.clearActiveHistory();
+        clearActiveHistory();
         const stateDIV = document.createElement("div");
         stateDIV.setAttribute("active","");
         stateDIV.className = "state";
+        let wording;
+        let score;
         switch (gameState){
             case 0:
-                const wording = gameManager.retNameLst[0];
+                wording = gameManager.retNameLst[0];
                 gameManager.incrementScore(0);
-                const score = gameManager.retScoreLst[0];
+                score = gameManager.retScoreLst[0];
                 stateDIV.textContent = `${wording} wins! Score is ${score} now!`;
                 break;
 
             case 1:
-                const wording = gameManager.retNameLst[1];
+                wording = gameManager.retNameLst[1];
                 gameManager.incrementScore(1);
-                const score = gameManager.retScoreLst[1];
+                score = gameManager.retScoreLst[1];
                 stateDIV.textContent = `${wording} wins! Score is ${score} now!`;
                 break;
 
             case 3:
                 stateDIV.textContent = `Draw!`;
+                break;
         }
 
         hisBoard.appendChild(stateDIV);
@@ -458,7 +489,7 @@ const domHandler = (() => {
         p1Score.textContent = p1;
         p2Score.textContent = p2;
     }
-    return {domInit, modeSelectorDOM, boardReset, cellDisplayUpdate};
+    return {domInit, modeSelectorDOM, boardReset, cellDisplayUpdate, notifyWin, updateScoreDisplay, notifyDecision, notifyTurn};
 
 
 })();
@@ -495,7 +526,12 @@ const gameManager = (() => {
         else player1.scoreIncrement();
     };
 
-    return {toggleTurn, toggleMode, getTurn, getMode, assignPlayer, retNameLst, retScoreLst};
+    const resetScore = () => {
+        player1.scoreReset();
+        player2.scoreReset();
+    };
+
+    return {toggleTurn, toggleMode, getTurn, getMode, assignPlayer, retNameLst, retScoreLst, incrementScore, resetScore};
 
 })();
 
