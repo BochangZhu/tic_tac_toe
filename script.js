@@ -305,32 +305,23 @@ const domHandler = (() => {
                             setTimeout(() =>{
                                 domHandler.boardReset();
                                 domHandler.notifyTurn();
-                                boardDIV.classList.remove("locked");
                                 // bot mode handling
                                 turn = gameManager.getTurn();
                                 // fake click simulation
                                 if (turn == -1 && mode == -1) {
-                                    boardDIV.classList.add("locked");
                                     domHandler.botNoti();
-                                    
-                                    async function botSimulation(){
+
+                                    (async function botSimulation(){
                                         const rand = (Math.random() * 2.5 + 2) * 1000;
                                         await new Promise(resolve => setTimeout(() => resolve(), rand));
-                                        const availPos = [];
-                                        const board = gameBoard.retBoard();
-                                        for (let i = 0; i < 3; i++){
-                                            for (let j = 0; j < 3; j++){
-                                                if (board[i][j] == -1){
-                                                    availPos.push(i*3 + j);
-                                                }
-                                            }
-                                        }
-                                        // pick a pos from
-                                        const choice = Math.random
+                                        // pick a position choice from 0 - 9
+                                        const choice = Math.floor(Math.random() * 9);
                                         boardDIV.classList.remove("locked");
-
-                                    };
-                                    thinkSimulation();
+                                        boardDIV.children[choice].click();
+                                    })();
+                                }
+                                else {
+                                    boardDIV.classList.remove("locked");
                                 }
                             }, 3000);
                             domHandler.notifyWin(gameState);
@@ -347,6 +338,34 @@ const domHandler = (() => {
                                 if (turn == 1) gameManager.toggleTurn();
                             }
                             round += 1;
+                        }
+
+                        else if (gameState == 4) {
+                            domHandler.notifyTurn();
+                            // bot mode handling
+                            turn = gameManager.getTurn();
+                            // fake click simulation
+                            if (turn == -1 && mode == -1) {
+                                boardDIV.classList.add("locked");
+                                domHandler.botNoti();
+                                (async function botSimulation(){
+                                    const rand = (Math.random() * 2.5 + 2) * 1000;
+                                    await new Promise(resolve => setTimeout(() => resolve(), rand));
+                                    const availPos = [];
+                                    const board = gameBoard.retBoard();
+                                    for (let i = 0; i < 3; i++){
+                                        for (let j = 0; j < 3; j++){
+                                            if (board[i][j] == -1){
+                                                availPos.push(i*3 + j); // push index pos
+                                            }
+                                        }
+                                    }
+                                    // pick a choice from availPos
+                                    const choice = Math.floor(Math.random() * availPos.length);
+                                    boardDIV.classList.remove("locked");
+                                    boardDIV.children[availPos[choice]].click();
+                                })();
+                            }
                         }
                     });
 
