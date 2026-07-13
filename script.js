@@ -16,40 +16,41 @@ const gameBoard = (() => {
     
     const retBoard = () => boardMatrix;
 
-    // p1 => 0, p2 => 1, draw => 3, unfinished => 4
+    // ret: p1 => 0, p2 => 1, draw => 3, unfinished => 4; highlighted cell pos list
     function decideGameState(){
         // row check
-        for (const row of boardMatrix){
-            if (row[0] == row[1] && row[1] == row[2] && row[0] >= 0){
-                return row[0];
+        for (let row = 0; row < 3; row++){
+            const temp = boardMatrix[row];
+            if (temp[0] == temp[1] && temp[1] == temp[2] && temp[0] >= 0){
+                return [temp[0], [row*3, row*3 + 1, row*3 + 2]];
             }
         }
 
         // col check
         for (let i = 0; i < 3; i++) {
             if (boardMatrix[0][i] == boardMatrix[1][i] && boardMatrix[0][i] == boardMatrix[2][i] && boardMatrix[0][i] >= 0){
-                return boardMatrix[0][i]
+                return [boardMatrix[0][i], [i, 3 + i, 6 + i]];
             }
         }
 
         // diagonal check
 
         if (boardMatrix[0][0] == boardMatrix[1][1] && boardMatrix[0][0] == boardMatrix[2][2] && boardMatrix[0][0] >= 0){
-            return boardMatrix[0][0];
+            return [boardMatrix[0][0], [0, 4, 8]];
         }
 
         if (boardMatrix[0][2] == boardMatrix[1][1] && boardMatrix[0][2] == boardMatrix[2][0] && boardMatrix[0][2] >= 0){
-            return boardMatrix[0][2];
+            return [boardMatrix[0][2], [2, 4, 6]];
         }
 
         // draw check
         for (const row of boardMatrix){
             for (const code of row){
-                if (code == -1) return 4;
+                if (code == -1) return [4, []];
             }
         }
 
-        return 3;
+        return [3, []];
     }
 
     // put literal to arr position
@@ -263,11 +264,12 @@ const domHandler = (() => {
     const boardReset = () => {
         // 1st time init board
         if (!mainPanel.querySelector('.boardDIV')) {
-            // insert scoreBoard
+            // insert gameBoard
             boardDIV.className = "boardDIV";
 
             let index = 0;
 
+            // insert cell based on Board size
             for (const row of gameBoard.retBoard()){
                 for (const code of row){
                     const tempCell = document.createElement("div");
@@ -275,6 +277,7 @@ const domHandler = (() => {
                     tempCell.className = "cell";
 
                     tempCell.addEventListener("click", (event)=>{
+                        const mode = gameManager.getMode();
                         // "frontend" update
                         const id = event.target.id;
                         domHandler.cellDisplayUpdate(id);
@@ -287,21 +290,56 @@ const domHandler = (() => {
                         // backend
                         const code = (turn == 1) ? 0 : 1;
                         gameBoard.placeItem(code, row, col);
-                        const gameState = gameBoard.decideGameState();
+                        const gameState = gameBoard.decideGameState()[0];
 
                         // switch turn
                         gameManager.toggleTurn();
                         // if one wins or draw, noti win -> update  score -> reset board mat -> clear boardDIV display
                         if (gameState != 4) {
-                            turn = gameManager.getTurn();
+                            const highlight = gameBoard.decideGameState()[1];
+                            // highlight winning cells if any
+                            for (const pos of highlight){
+                                boardDIV.children[pos].classList.add("highlight");
+                            }
+                            boardDIV.classList.add("locked");
+                            setTimeout(() =>{
+                                domHandler.boardReset();
+                                domHandler.notifyTurn();
+                                boardDIV.classList.remove("locked");
+                                // bot mode handling
+                                turn = gameManager.getTurn();
+                                // fake click simulation
+                                if (turn == -1 && mode == -1) {
+                                    boardDIV.classList.add("locked");
+                                    domHandler.botNoti();
+                                    
+                                    async function botSimulation(){
+                                        const rand = (Math.random() * 2.5 + 2) * 1000;
+                                        await new Promise(resolve => setTimeout(() => resolve(), rand));
+                                        const availPos = [];
+                                        const board = gameBoard.retBoard();
+                                        for (let i = 0; i < 3; i++){
+                                            for (let j = 0; j < 3; j++){
+                                                if (board[i][j] == -1){
+                                                    availPos.push(i*3 + j);
+                                                }
+                                            }
+                                        }
+                                        // pick a pos from
+                                        const choice = Math.random
+                                        boardDIV.classList.remove("locked");
+
+                                    };
+                                    thinkSimulation();
+                                }
+                            }, 3000);
                             domHandler.notifyWin(gameState);
                             // scoreBoard update
                             domHandler.updateScoreDisplay();
                             // backend reset
                             gameBoard.resetBoard();
-                            // visual reset
-                            domHandler.boardReset();
                             // exchange first hand
+                            turn = gameManager.getTurn();
                             if (round % 2 == 0) {
                                 if (turn == -1) gameManager.toggleTurn();
                             }
@@ -310,13 +348,13 @@ const domHandler = (() => {
                             }
                             round += 1;
                         }
-                        domHandler.notifyTurn();
                     });
 
                     boardDIV.appendChild(tempCell);
                     index += 1;
                 }
             }
+
             mainPanel.appendChild(boardDIV);
 
             // insert scoreBoard
@@ -337,12 +375,13 @@ const domHandler = (() => {
             mainPanel.appendChild(scoreBoard);
 
             // insert historyBoard
-
             hisBoard.className = "hisBoard";
             const hisTitle = document.createElement("div");
             hisTitle.className = "hisTitle";
             hisTitle.textContent = "History";
             hisBoard.appendChild(hisTitle);
+
+            // insert resetScore icon
             const resetIcon = document.createElement("img");
             resetIcon.className = "reset";
             resetIcon.alt = "reset score";
@@ -367,6 +406,7 @@ const domHandler = (() => {
                 dialog.showModal();
             });
             scoreBoard.appendChild(resetIcon);
+
             mainPanel.appendChild(hisBoard);
         }
 
@@ -428,6 +468,16 @@ const domHandler = (() => {
         btn2.addEventListener("click", btn2Event2);
         btn1.addEventListener("click", btn1Event2);
 
+    }
+
+    const botNoti = () => {
+        clearActiveHistory();
+
+        const botNoti = document.createElement("div");
+        botNoti.className = "botNoti";
+        botNoti.textContent = "Silly(bot) is thinking...";
+
+        hisBoard.appendChild(botNoti);
     }
 
     const notifyTurn = () => {
@@ -501,7 +551,7 @@ const domHandler = (() => {
         p1Score.textContent = p1;
         p2Score.textContent = p2;
     }
-    return {domInit, modeSelectorDOM, boardReset, cellDisplayUpdate, notifyWin, updateScoreDisplay, notifyDecision, notifyTurn};
+    return {domInit, modeSelectorDOM, boardReset, cellDisplayUpdate, notifyWin, updateScoreDisplay, notifyDecision, notifyTurn, botNoti};
 
 
 })();

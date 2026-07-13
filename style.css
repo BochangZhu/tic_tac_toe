@@ -45,6 +45,11 @@
     height: 35vmax;
     display: grid;
     grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+    &.locked:hover, &.locked *:hover {
+        cursor: not-allowed;
+        pointer-events: none;
+        opacity: 0.85;
+    }
     .cell{
         display: grid;
         place-content: center;
@@ -53,6 +58,10 @@
             pointer-events: none;
         }
         border: 5px solid black;
+        transition: filter 0.3s ease;
+        &.highlight{
+            filter: brightness(1.2) drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+        }
     }
 }
 
