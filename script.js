@@ -193,7 +193,7 @@ const domHandler = (() => {
         submit.value = "bot";
         nameForm.style.display = "";
         input2.readOnly = true;
-        input2.value = "Silly(bot)";
+        input2.value = "Bot";
 
         dialog.addEventListener("close", startGameEvent);
         
@@ -251,9 +251,10 @@ const domHandler = (() => {
     let round = 1;
 
     const clearActiveHistory = () =>{
-        const active = hisBoard.querySelector("[active]");
+        const active = hisBoard.querySelector("[active], [thinking]");
         if (active){
             active.removeAttribute("active");
+            active.removeAttribute("thinking");
         }
         const notiLst = hisBoard.children;
         if (notiLst.length == 5){
@@ -277,6 +278,9 @@ const domHandler = (() => {
                     tempCell.className = "cell";
 
                     tempCell.addEventListener("click", (event)=>{
+                        if (event.currentTarget.classList.contains('placed')){
+                            return;
+                        }
                         const mode = gameManager.getMode();
                         // "frontend" update
                         const id = event.target.id;
@@ -304,13 +308,11 @@ const domHandler = (() => {
                             boardDIV.classList.add("locked");
                             setTimeout(() =>{
                                 domHandler.boardReset();
-                                domHandler.notifyTurn();
-                                // bot mode handling
                                 turn = gameManager.getTurn();
-                                // fake click simulation
+                                // bot mode handling
                                 if (turn == -1 && mode == -1) {
                                     domHandler.botNoti();
-
+                                    // fake click simulation
                                     (async function botSimulation(){
                                         const rand = (Math.random() * 2.5 + 2) * 1000;
                                         await new Promise(resolve => setTimeout(() => resolve(), rand));
@@ -321,6 +323,7 @@ const domHandler = (() => {
                                     })();
                                 }
                                 else {
+                                    domHandler.notifyTurn();
                                     boardDIV.classList.remove("locked");
                                 }
                             }, 3000);
@@ -341,7 +344,6 @@ const domHandler = (() => {
                         }
 
                         else if (gameState == 4) {
-                            domHandler.notifyTurn();
                             // bot mode handling
                             turn = gameManager.getTurn();
                             // fake click simulation
@@ -365,6 +367,9 @@ const domHandler = (() => {
                                     boardDIV.classList.remove("locked");
                                     boardDIV.children[availPos[choice]].click();
                                 })();
+                            }
+                            else {
+                                domHandler.notifyTurn();
                             }
                         }
                     });
@@ -427,6 +432,8 @@ const domHandler = (() => {
             scoreBoard.appendChild(resetIcon);
 
             mainPanel.appendChild(hisBoard);
+
+            domHandler.notifyTurn();
         }
 
         // reset
@@ -474,7 +481,7 @@ const domHandler = (() => {
 
         // reset hint
         btn1.textContent = "My friend";
-        btn2.textContent = "Silly (bot)";
+        btn2.textContent = "Bot";
 
         // remove events
         btn2.removeEventListener("click", btn2Event1);
@@ -494,7 +501,8 @@ const domHandler = (() => {
 
         const botNoti = document.createElement("div");
         botNoti.className = "botNoti";
-        botNoti.textContent = "Silly(bot) is thinking...";
+        botNoti.textContent = "Bot is thinking...";
+        botNoti.setAttribute("thinking", "");
 
         hisBoard.appendChild(botNoti);
     }
@@ -516,7 +524,7 @@ const domHandler = (() => {
         const turnDIV = document.createElement("div");
         turnDIV.setAttribute("active","");
         turnDIV.className = "turn";
-        turnDIV.textContent = "It's " + target + "'s turn, place your " + symbol + "!";
+        turnDIV.textContent = target + " is placing " + symbol + "...";
         
         hisBoard.appendChild(turnDIV);
     };
@@ -526,10 +534,7 @@ const domHandler = (() => {
         const decDIV = document.createElement("div");
         decDIV.setAttribute("active","");
         decDIV.className = "decision";
-        let symbol;
-        if (turn == 1) symbol = "O";
-        else symbol = "X";
-        decDIV.textContent = `${symbol} is placed at row ${row+1} and column ${col+1}.`;
+        decDIV.textContent = `Placed at [${row+1},${col+1}]`;
         hisBoard.appendChild(decDIV);
     };
 
@@ -545,7 +550,7 @@ const domHandler = (() => {
                 wording = gameManager.retNameLst()[0];
                 gameManager.incrementScore(0);
                 score = gameManager.retScoreLst()[0];
-                stateDIV.textContent = `${wording} wins! Score is ${score} now!`;
+                stateDIV.textContent = `${wording} wins! Score: ${score}`;
                 stateDIV.classList.add("win");
                 break;
 
@@ -553,12 +558,12 @@ const domHandler = (() => {
                 wording = gameManager.retNameLst()[1];
                 gameManager.incrementScore(1);
                 score = gameManager.retScoreLst()[1];
-                stateDIV.textContent = `${wording} wins! Score is ${score} now!`;
+                stateDIV.textContent = `${wording} wins! Score: ${score}`;
                 stateDIV.classList.add("win");
                 break;
 
             case 3:
-                stateDIV.textContent = `Draw!`;
+                stateDIV.textContent = `It's a draw!`;
                 stateDIV.classList.add("draw");
                 break;
         }

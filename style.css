@@ -2,6 +2,7 @@
     padding: 0;
     margin: 0;
     box-sizing: border-box;
+    user-select: none;
 }
 
 @keyframes fadeIn {
@@ -21,7 +22,7 @@
     --form-padding: 6px;
     --board-font-size: 2.25rem;
     --theme-font: "Geist Pixel";
-    --his-font-size: 27.5px;
+    --his-font-size: 30.5px;
 
     --icon-width: 150px;
 
@@ -48,19 +49,17 @@
     &.locked:hover, &.locked *:hover {
         cursor: not-allowed;
         pointer-events: none;
-        opacity: 0.85;
     }
     .cell{
         display: grid;
         place-content: center;
         &.placed:hover, &.placed>*:hover {
             cursor: not-allowed;
-            pointer-events: none;
         }
         border: 5px solid black;
         transition: filter 0.3s ease;
         &.highlight{
-            filter: brightness(1.2) drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+            filter: brightness(12) drop-shadow(0 0 10px rgba(0, 128, 0, 0.8));
         }
     }
 }
@@ -122,6 +121,9 @@ body {
         &>*:nth-child(2n+3){
             font-weight: bold;
         }
+        &>*:not(:first-child) {
+            text-shadow: 0 2px 0 #451a03, 0 4px 8px rgba(0, 0, 0, 0.8), 0 0 10px rgba(251, 191, 36, 0.3); 
+        }
         .reset {
             position: absolute;
             right: 6%;
@@ -174,6 +176,7 @@ body {
     font-size: var(--his-font-size, 27.5px);
     overflow-y: auto;
     .hisTitle {
+        position: relative;
         align-self: start;
         font-size: var(--board-font-size, 2.25rem);
     }
@@ -197,15 +200,18 @@ body {
         }
 
         font-weight: bolder;
+        color:green;
+    }
+    &>div:not(:first-child){
+        text-shadow: 0 2px 0 rgb(127,105,94), 0 4px 8px rgba(0, 0, 0, 0.8), 0 0 10px rgba(251, 191, 36, 0.3); 
     }
     &>div.decision{
-        font-size: 22.5px;
-        font-style: italic;
-        border-bottom: 1px dashed black;
+        position: relative;
+        font-size: 22px;
+        bottom: -16%;
     }
-    &>div[active] {
-        color: green;
-        font-weight: bold;
+    &>div[active], &>div[thinking] {
+        font-weight: bolder;
     }
     &>*:first-child {
         font-weight: bold;
@@ -214,7 +220,6 @@ body {
     &>*:nth-child(1) {
         border-bottom: 5px solid rgb(165, 79, 42);
     }
-
     &::before{
         content: "";
         border-radius: 25px;
